@@ -1,0 +1,50 @@
+#+TITLE: Emacs Config File
+#+AUTHOR: Nicholas Huber
+#+STARTUP: overview
+#+PROPERTY: header-args:emacs-lisp :tangle /home/nick/.dotfiles/.emacs.d/init.el
+
+* File Header
+#+begin_src emacs-lisp
+  ;;;; Emacs Init File
+  ;;; Nicholas Huber
+  ;;; 20210529
+#+end_src
+
+* Repos
+** Initialize Repos
+#+begin_src emacs-lisp
+  ;;; Repos
+  ;; Initialize Packages
+
+  (require 'package)
+  (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+			   ("melpa-stable" . "https://stable.melpa.org/packages/")
+			   ("org" . "https://orgmode.org/elpa/")
+			   ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+* Default Coding
+  #+begin_src emacs-lisp
+    (set-default-coding-systems 'utf-8)
+  #+end_src
+
+* Server Mode
+** start emacs server
+   #+begin_src emacs-lisp
+     (server-start)
+   #+end_src
+
+* Theme
+  #+begin_src emacs-lisp
+    (use-package spacegray-theme :defer t)
+    (use-package doom-themes :defer t)
+    (load-theme 'doom-palenight t)
+    (doom-themes-visual-bell-config)
+  #+end_src

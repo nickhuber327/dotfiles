@@ -1,0 +1,199 @@
+#+TITLE: Emacs Config File
+#+AUTHOR: Nicholas Huber
+#+STARTUP: overview
+#+PROPERTY: header-args:emacs-lisp :tangle /home/nick/.dotfiles/.emacs.d/init.el
+
+* File Header
+#+begin_src emacs-lisp
+  ;;;; Emacs Init File
+  ;;; Nicholas Huber
+  ;;; 20210529
+#+end_src
+
+* Repos
+** Initialize Repos
+#+begin_src emacs-lisp
+  ;;; Repos
+  ;; Initialize Packages
+
+  (require 'package)
+  (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+			   ("melpa-stable" . "http://stable.melpa.org/packages/")
+			   ("org" . "http://orgmode.org/elpa/")
+			   ("elpa" . "http://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+* Default Coding
+  #+begin_src emacs-lisp
+    ;;; Set default coding system
+    ;;  Set to UTF-8
+
+    (set-default-coding-systems 'utf-8)
+  #+end_src
+
+* Server Mode
+** start emacs server
+   #+begin_src emacs-lisp
+     ;;; Start the Emacs Server
+
+     (server-start)
+   #+end_src
+
+* Theme
+  #+begin_src emacs-lisp
+    ;;; Themes
+    ;;  Install themes
+
+    (use-package spacegray-theme :defer t)
+    (use-package doom-themes :defer t)
+
+    ;;  Load theme
+
+    (load-theme 'doom-palenight t)
+    (doom-themes-visual-bell-config)
+  #+end_src
+
+* GUI Options
+  #+begin_src emacs-lisp
+    ;;; GUI options
+    ;;  Customize the GUI interface
+
+    (column-number-mode 1)
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+  #+end_src
+
+* Unicode Glyph support
+  #+begin_src emacs-lisp
+    ;;; Unicode Glyph Support
+
+    (defun nh/replace-unicode-font-mapping (block-name old-font new-font)
+      (let* ((block-idx (cl-position-if
+			 (lambda (i) (string-equal (car i) block-name))
+			 unicode-fonts-block-font-mapping))
+	     (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+	     (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+	(setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+	      `(,updated-block))))
+
+    (use-package unicode-fonts
+      :custom (unicode-fonts-skip-font-groups '(low-quality-glyphs))
+      :config (mapcar
+	       (lambda (block-name)
+		 (nh/replace-unicode-font-mapping block-name "Apple Color Emoji" "Noto Color Emoji"))
+	       '("Dingbats"
+		 "Emoticons"
+		 "Miscellaneous Symbols and Pictographs"
+		 "Transport and Map Symbols"))
+      (unicode-fonts-setup))
+  #+end_src
+
+* Emojis in buffers
+#+begin_src emacs-lisp :tangle nil
+  ;;; Emojis in buffers
+
+  (use-package emojify
+    :hook (erc-mode . emojify-mode)
+    :commands emojify-mode)
+#+end_src
+
+* Mode Line
+** Basic Customization
+   #+begin_src emacs-lisp
+     ;;; Mode Line
+     ;;  Basic Customization
+
+     (setq display-time-format "%k:%M %Y%m%d" ; format: 24h year month day
+	   display-time-default-load-average nil)
+   #+end_src
+
+** Mode Diminishing
+   #+begin_src emacs-lisp
+     ;; Enable mode diminishing
+
+     (use-package diminish) ; Hides minor mode from modeline
+   #+end_src
+
+** Smart Mode Line
+   #+begin_src emacs-lisp
+     ;; Smart Mode Line
+     ;; Prettifies modeline
+
+     (use-package smart-mode-line
+       :config
+       (setq sml/no-confirm-load-theme t)
+       (sml/setup)
+       (sml/apply-theme 'respectful) ; Respects the themes colors
+       (setq sml/mode-width 'right
+	     sml/name-width 60)
+
+       (setq-default mode-line-format
+		     `("%e"
+		       mode-line-front-space
+		       evil-mode-line-tage
+		       ;mode-line-mule-info
+		       mode-line-client
+		       mode-line-modified
+		       mode-line-remote
+		       mode-line-frame-identification
+		       mode-line-buffer-identification
+		       sml/pos-id-separator
+		       (vc-mode vc-mode)
+		       " "
+		       ;mode-line-position
+		       sml/pre-mode-separator
+		       mode-line-modes
+		       " "
+		       mode-line-misc-info)))
+   #+end_src
+
+** Doom Modeline
+  #+begin_src emacs-lisp
+    ;; Doom Modeline
+    ;; Install all the icons
+    (use-package all-the-icons)
+
+    ;; Hook minons to doom-modeline
+    (use-package minions
+      :hook (doom-modeline-mode . minions-mode))
+
+    ;;Setup doom modeline
+    (use-package doom-modeline
+      :after eshell
+      :hook (after-init . doom-modeline-init)
+      :custom-face
+      (mode-line ((t (:height 0.85))))
+      (mode-line-inactive ((t (:height 0.85))))
+      :custom
+      (doom-modeline-height 15)
+      (doom-modeline-bar-width 6)
+      (doom-modeline-lsp t)
+      (doom-modeline-github nil)
+      (doom-modeline-mu4e nil)
+      (doom-modeline-irc nil)
+      (doom-modeline-minor-modes t)
+      (doom-modeline-persp-name nil)
+      (doom-modeline-buffer-file-name-style 'truncate-except-project)
+      (doom-modeline-major-mode-icon nil))
+  #+end_src
+
+* Org
+** Org Tempo
+   #+begin_src emacs-lisp
+     ;; Org Tempo
+
+     (use-package org-tempo
+       :ensure nil
+       :config (setq org-structure-template-alist '(("sh" . "src shell")
+						    ("el" . "src emacs-lisp")
+						    ("lgr" . "src ledger")
+						    ("tmux" . "src tmux"))))
+   #+end_src
