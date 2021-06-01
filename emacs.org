@@ -46,7 +46,7 @@
      (server-start)
    #+end_src
 
-* Theme
+* Themes
   #+begin_src emacs-lisp
     ;;; Themes
     ;;  Install themes
@@ -56,7 +56,7 @@
 
     ;;  Load theme
 
-    (load-theme 'doom-palenight t)
+    (load-theme 'doom-moonlight t)
     (doom-themes-visual-bell-config)
   #+end_src
 
@@ -64,13 +64,221 @@
   #+begin_src emacs-lisp
     ;;; GUI options
     ;;  Customize the GUI interface
-
+    (global-display-line-numbers-mode 1)
     (column-number-mode 1)
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
+
+    ;; Turn off line numbers for some modes
+    (dolist (mode '(term-mode-hook
+		    shell-mode-hook
+		    eshell-mode-hook))
+      (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
   #+end_src
 
+* UI
+** Rainbow Delimiters
+   #+begin_src emacs-lisp
+     ;; Rainbow delimiters
+     (use-package rainbow-delimiters
+       :hook (prog-mode . rainbow-delimiters-mode))
+   #+end_src
+
+** Which Key
+   #+begin_src emacs-lisp
+     ;; Which key
+     (use-package which-key
+       :init (which-key-mode)
+       :diminish which-key-mode
+       :config
+       (setq which-key-idle-delay 0.3))
+   #+end_src
+   
+** Ivy
+   #+begin_src emacs-lisp
+     ;; Ivy
+
+     ;; Install swiper
+     (use-package swiper)
+
+     ;; Configure Ivy
+     (use-package ivy
+       :diminish
+       :bind (("C-s" . swiper)
+	      :map ivy-minibuffer-map
+	      ("TAB" . ivy-alt-done)
+	      ("C-l" . ivy-alt-done)
+	      ("C-j" . ivy-next-line)
+	      ("C-k" . ivy-previous-line)
+	      :map ivy-switch-buffer-map
+	      ("C-k" . ivy-previous-line)
+	      ("C-l" . ivy-done)
+	      ("C-d" . ivy-switch-buffer-kill)
+	      :map ivy-reverse-i-search-map
+	      ("C-k" . ivy-previous-line)
+	      ("C-d" . ivy-reverse-i-search-kill))
+       :config
+       (ivy-mode 1))
+
+     ;; Ivy Rich
+     (use-package ivy-rich
+       :init
+       (ivy-rich-mode 1))
+   #+end_src
+
+** Prettify Mode
+   #+begin_src emacs-lisp
+     ;;; UI Config
+     ;;  Prettify Mode
+     (global-prettify-symbols-mode 1)
+
+     ;; Custom Prettify Functions
+     (defun nh/add-pretty-haskell ()
+       "Replace strings with unicode chars"
+       (setq prettify-symbols-alist
+	     '(
+	       ("->" . 8594)
+	       ("=>" . 8658)
+	       ("map" . 8614))))
+     (add-hook 'haskell-mode-hook 'nh/add-pretty-haskell)
+   #+end_src
+** Counsel
+   #+begin_src emacs-lisp
+     ;; Counsel
+
+     (use-package counsel
+       :bind (("C-M-j" . counsel-switch-buffer)
+	      ("M-x" . counsel-M-x)
+	      :map minibuffer-local-map
+	      ("C-r" . 'counsel-minibuffer-history))
+       :config
+       (counsel-mode 1))
+   #+end_src
+** Helpful
+   #+begin_src emacs-lisp
+     ;; Helpful
+
+     (use-package helpful
+       :custom
+       (counsel-describe-function-function #'helpful-callable)
+       (counsel-describe-variable-function #'helpful-variable)
+       :bind
+       ([remap describe-function] . counsel-describe-function)
+       ([remap describe-command] . helpful-command)
+       ([remap describe-variable] . counsel-describe-variable)
+       ([remap describe-key] . helpful-key))
+   #+end_src
+
+* Key Bindings
+** Global Key Bindings
+   #+begin_src emacs-lisp
+     ;;; Key Bindings
+     ;;  Global Key Bindings
+
+     (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+   #+end_src
+
+** Evil
+   #+begin_src emacs-lisp
+     ;; Evil Mode!!
+
+     ;; Define what modes need to begin in emacs mode
+     (defun nh/evil-hook ()
+       (dolist (mode '(eshell-mode
+		       term-mode
+		       shell-mode))
+	 (add-to-list 'evil-emacs-state-modes mode)))
+
+     (use-package evil
+       :init
+       (setq evil-want-integration t)
+       (setq evil-want-keybinding nil)
+       (setq evil-want-C-u-scroll t)
+       (setq evil-want-C-d-scroll t)
+       (setq evil-want-C-i-jump nil)
+       :config
+       (add-hook 'evil-mode-hook 'nh/evil-hook)
+       (evil-mode 1)
+       (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+       (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+       ;; Use visual line motions even outside of visual-line-mode buffers
+       (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+       (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+       (evil-set-initial-state 'messages-buffer-mode 'normal)
+       (evil-set-initial-state 'dashboard-mode 'normal))
+
+     ;; Evil Collection
+     ;; Collection of evil mode configs for different modes
+     (use-package evil-collection
+       :after evil
+       :config
+       (evil-collection-init))
+
+   #+end_src
+   
+** General
+   #+begin_src emacs-lisp
+     ;; General
+
+     (use-package general
+       :config
+       (general-evil-setup t)
+       (general-create-definer nh/leader-keys
+			       :keymaps '(normal insert visual emacs)
+			       :prefix "SPC"
+			       :global-prefix "C-SPC"))
+   #+end_src
+   
+*** Leader Keys Files
+    #+begin_src emacs-lisp
+      ;; Leader Keys
+      ;; Files
+
+      (nh/leader-keys
+        "f"   '(:ignore t :which-key "Files")
+        "ff"  '(find-file :which-key "Find file")
+        "fd"  '(:ignore t :which-key "Dotfiles")
+        "fdE" '((lambda () (interactive) (find-file "~/.dotfiles/emacs.org")) :which-key "Open init file")
+        "fdF" '((lambda () (interactive) (find-file "~/Documents/Finance/finance.org")) :which-key "Open finance file")
+        "fdS" '((lambda () (interactive) (find-file "~/.dotfiles/ssh.org")) :which-key "Open SSH file")
+        "fdN" '((lambda () (interactive) (find-file "~/Documents/Network/network.org")) :which-key "Open network file"))
+     #+end_src
+     
+*** Leader Keys Buffers
+    #+begin_src emacs-lisp
+      ;; Buffers
+
+      (nh/leader-keys
+	"b" '(:ignore t :which-key "buffers")
+	"bk" '(kill-buffer :which-key "Kill buffer")
+	"bK" '(kill-current-buffer :which-key "Kill current buffer")
+	"bs" '(swiper :which-key "Swiper")
+	"br" '(revert-buffer :which-key "Revert Buffer")
+	"be" '(eval-buffer :which-key "Eval Buffer")
+	"bS" '(counsel-switch-buffer :which-key "Switch Buffer"))
+    #+end_src
+
+*** Leader Keys Org
+    #+begin_src emacs-lisp
+      ;; Leader Keys Org
+
+      (nh/leader-keys
+	"o"  '(:ignore t :which-key "Org Mode")
+	"ot" '(org-babel-tangle :which-key "OB tangle")
+	"oe" '(org-edit-special :which-key "Edit source")
+	"oa" '(org-agenda :which-key "Org Agenda"))
+    #+end_src
+*** Leader Keys Misc
+    #+begin_src emacs-lisp
+      ;; Leader Keys Misc
+
+      (nh/leader-keys
+        ":" '(execute-extended-command :which-key "M-x"))
+    #+end_src
 * Unicode Glyph support
   #+begin_src emacs-lisp
     ;;; Unicode Glyph Support
@@ -97,7 +305,7 @@
   #+end_src
 
 * Emojis in buffers
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
   ;;; Emojis in buffers
 
   (use-package emojify
@@ -153,8 +361,9 @@
 		       mode-line-modes
 		       " "
 		       mode-line-misc-info)))
+     (smart-mode-line-enable 1)
    #+end_src
-
+   
 ** Doom Modeline
   #+begin_src emacs-lisp
     ;; Doom Modeline
@@ -183,9 +392,45 @@
       (doom-modeline-persp-name nil)
       (doom-modeline-buffer-file-name-style 'truncate-except-project)
       (doom-modeline-major-mode-icon nil))
+    (doom-modeline-mode 1)
   #+end_src
 
 * Org
+** Org
+   #+begin_src emacs-lisp
+     ;; Org mode
+
+     (use-package org
+       :mode ("\\.org\\'" . org-mode)
+       :config
+       (add-hook 'org-mode-hook 'nh/after-org-mode-load)
+       (setq org-ellipsis " ▼")
+       (variable-pitch-mode 1))
+
+     ;; Hook for after org mode loads
+     (defun nh/after-org-mode-load ()
+       "Set these after org mode loads"
+       (visual-line-mode)
+       (require 'org-indent)
+       (org-indent-mode))
+   #+end_src
+** Superstar
+   #+begin_src emacs-lisp
+     ;; Org Superstar
+
+     ;; Download org-bullets
+     (use-package org-bullets)
+
+     ;; Config Superstar
+     (use-package org-superstar
+       :after org
+       :hook (org-mode . org-superstar-mode)
+       :custom
+       (org-superstar-remove-leading-stars t)
+       (org-superstar-headline-bullets-list '("⦿" "○" "‣" "⦿" "○" "‣" "⦿")))
+
+
+   #+end_src
 ** Org Tempo
    #+begin_src emacs-lisp
      ;; Org Tempo
@@ -197,3 +442,77 @@
 						    ("lgr" . "src ledger")
 						    ("tmux" . "src tmux"))))
    #+end_src
+** Install tmux
+   #+begin_src emacs-lisp
+     ;; Install tmux
+
+     (use-package ob-tmux)
+   #+end_src
+** Org Babel
+   #+begin_src emacs-lisp
+     ;; Org Babel
+
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((R . t)
+	(emacs-lisp . t)
+	(gnuplot . t)
+	(haskell . t)
+	(latex . t)
+	(ledger . t)
+	(python . t)
+	(sql . nil)
+	(sqlite . t)
+	(tmux . t)))
+   #+end_src
+
+** Evil Org
+   #+begin_src emacs-lisp
+     ;; Evil Org
+
+     (use-package evil-org
+       :hook (org-mode . evil-org-mode))
+   #+end_src
+** Org Export SSH
+#+begin_src emacs-lisp
+  ;; Org Export SSH
+
+  (use-package ox-ssh)
+#+end_src
+* Ledger
+  #+begin_src emacs-lisp
+    ;;; Ledger Mode
+
+    (use-package ledger-mode
+      :mode ("\\.lgr\\'" . ledger-mode))
+  #+end_src
+** Evil-Ledger
+   #+begin_src emacs-lisp
+     ;; Evil Ledger Mode
+
+     (use-package evil-ledger
+       :hook (ledger-mode . evil-ledger-mode))
+   #+end_src
+* Custom Set Variables
+  #+begin_src emacs-lisp
+    ;;; Custom Set Variable
+
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(mode-line ((t (:height 0.85))))
+     '(mode-line-inactive ((t (:height 0.85))))
+     ;; M-x customize-group RET org-faces RET
+     ;;'(org-block-begin-line ((t (:background :foreground))))
+     '(org-block ((t (:background "#2d3452")))))
+     ;;'(org-block-end-line ((t (:background :foreground))))
+    (custom-set-variables
+     '(ledger-reports
+       '(("Budget Monthly" "ledger -p \"this year\" --monthly --average -f /home/nick/Documents/Finance/budget.lgr register ^expenses")
+         ("bal" "%(binary) -f %(ledger-file) bal")
+         ("reg" "%(binary) -f %(ledger-file) reg")
+         ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")
+         ("account" "%(binary) -f %(ledger-file) reg %(account)"))))
+  #+end_src

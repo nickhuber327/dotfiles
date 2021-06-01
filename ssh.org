@@ -1,0 +1,15 @@
+#+TITLE: SSH
+#+AUTHOR: Nicholas Huber
+#+DATE: 20210522
+
+* git-server.homelab.io
+:PROPERTIES:
+:IP: 192.168.0.7
+:SSH_USER: git
+:END:
+
+* jump-server.homelab.io
+ :PROPERTIES:
+ :IP: 192.168.0.7
+ :SSH_USER: jumper
+ :END:

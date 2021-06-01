@@ -1,0 +1,77 @@
+#+TITLE: TMUX Conf File
+#+AUTHOR: Nicholas Huber
+#+DATE: 20201114
+#+STARTUP: overview
+#+PROPERTY: header-args:tmux :tangle ~/.tmux.conf
+
+* Header
+#+BEGIN_SRC tmux
+  #### TMUX config file
+  ### Nicholas Huber
+  ### 20201114
+
+#+END_SRC
+
+* Keybindings
+** Redefine prefix
+#+BEGIN_SRC tmux
+  ## Keybindings
+
+  # Redefine prefix key
+  set -g prefix C-a
+  unbind C-b
+
+#+END_SRC
+
+** Enable prefix to be sent
+#+BEGIN_SRC tmux
+  # enable keys to be sent to programs
+  bind C-a send-prefix
+
+#+END_SRC
+
+** Basic keybindings
+#+BEGIN_SRC tmux
+  # change keys to split windows
+  bind | split-window -h
+  bind - split-window -v
+
+#+END_SRC
+
+* Settings
+** Change delay time
+#+begin_src tmux
+  ## Settings
+
+  # Set delay time
+  set -s escape-time 1
+
+#+end_src
+
+** 256 color
+#+begin_src tmux
+  # 256 color
+  set -g default-terminal "screen-256color"
+
+#+end_src
+
+* Plugins
+** Plugins
+#+begin_src tmux
+  ## Plugins
+
+  # Plugins
+  set -g @plugin 'tmux-plugins/tmp'
+  set -g @plugin 'tmux-plugins/tmux-sensible'
+
+  # Tmux pane plugin
+  set -g @plugin 'laishulu/emacs-tmux-pane'
+
+#+end_src
+
+** Initialize plugin manager
+#+begin_src tmux
+  # Initialize TMUX Plugin manager (keep at bottom)
+  run '~/.tmux/plugins/tpm/tpm'
+
+#+end_src

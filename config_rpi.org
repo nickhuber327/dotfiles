@@ -1,0 +1,15 @@
+1 make a directory in /boot/ called /boot/wpa_supplicant.conf
+2 contents:
+#+begin_src shell
+  ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+  update_config=1
+  country=<US>
+
+  network={
+      ssid="somethingratherobscure"
+      psk="fussballspielen"
+  }
+#+end_src
+3 touch file named ssh
+4 edit /etc/hostname to say chosen fully qualified or nonqualified hostname
+5 edit /etc/hosts, the line with 127.0.1.1 to say the fully qualitified hostname then nonqualified
