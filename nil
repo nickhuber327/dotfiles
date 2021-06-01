@@ -1,5 +1,0 @@
-;;; Emojis in buffers
-
-(use-package emojify
-  :hook (erc-mode . emojify-mode)
-  :commands emojify-mode)
