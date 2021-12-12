@@ -328,6 +328,10 @@
   (require 'org-indent)
   (org-indent-mode))
 
+(setq table-cell-horizontal-chars "\u2501")
+(setq table-cell-vertical-char ?\u2503)
+(setq table-cell-intersection-char ?\u2533)
+
 ;; Org Superstar
 
 ;; Download org-bullets
@@ -346,9 +350,10 @@
 (use-package org-tempo
   :ensure nil
   :config (setq org-structure-template-alist '(("sh" . "src shell")
-					       ("el" . "src emacs-lisp")
-					       ("lgr" . "src ledger")
-					       ("tmux" . "src tmux"))))
+                                               ("el" . "src emacs-lisp")
+                                               ("lgr" . "src ledger")
+                                               ("lisp" . "src lisp")
+                                               ("tmux" . "src tmux"))))
 
 ;; Install tmux
 
@@ -359,6 +364,7 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((R . t)
+   (lisp . t)
    (emacs-lisp . t)
    (gnuplot . t)
    (haskell . t)
