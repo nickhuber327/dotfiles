@@ -1,7 +1,7 @@
 #+TITLE: Emacs Config File
 #+AUTHOR: Nicholas Huber
 #+STARTUP: overview
-#+PROPERTY: header-args:emacs-lisp :tangle /home/nick/.dotfiles/.emacs.d/init.el
+#+PROPERTY: header-args:emacs-lisp :tangle /home/nicholashuber/.dotfiles/.emacs.d/init.el
 
 * File Header
 #+begin_src emacs-lisp
@@ -170,7 +170,7 @@
        ([remap describe-variable] . counsel-describe-variable)
        ([remap describe-key] . helpful-key))
    #+end_src
-
+   
 * Key Bindings
 ** Global Key Bindings
    #+begin_src emacs-lisp
@@ -437,15 +437,16 @@
    #+end_src
 ** Org Tempo
    #+begin_src emacs-lisp
-     ;; Org Tempo
+          ;; Org Tempo
 
-     (use-package org-tempo
-       :ensure nil
-       :config (setq org-structure-template-alist '(("sh" . "src shell")
-                                                    ("el" . "src emacs-lisp")
-                                                    ("lgr" . "src ledger")
-                                                    ("lisp" . "src lisp")
-                                                    ("tmux" . "src tmux"))))
+          (use-package org-tempo
+            :ensure nil
+            :config (setq org-structure-template-alist '(("sh" . "src shell")
+                                                         ("el" . "src emacs-lisp")
+                                                         ("lgr" . "src ledger")
+                                                         ("lisp" . "src lisp")
+                                                         ("tmux" . "src tmux")
+                                                         ("hs" . "src haskell"))))
    #+end_src
 ** Install tmux
    #+begin_src emacs-lisp

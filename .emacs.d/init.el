@@ -353,7 +353,8 @@
                                                ("el" . "src emacs-lisp")
                                                ("lgr" . "src ledger")
                                                ("lisp" . "src lisp")
-                                               ("tmux" . "src tmux"))))
+                                               ("tmux" . "src tmux")
+                                               ("hs" . "src haskell"))))
 
 ;; Install tmux
 
