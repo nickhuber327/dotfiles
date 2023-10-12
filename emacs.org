@@ -63,7 +63,12 @@
 
   (set-default-coding-systems 'utf-8)
 #+end_src
-
+* Backup
+Set default location of emacs backup files (files with a ~)
+#+begin_src emacs-lisp
+  ;;; Set default backup file location
+(setq backup-directory-alist '((".*" . "~/.Trash")))
+#+end_src
 * Start Emacs Server
 #+begin_src emacs-lisp
   ;;; Start the Emacs Server
